@@ -67,3 +67,33 @@ export function fetchNews(
     callback(error);
   });
 }
+function request<T>(url: string): Promise<T> {
+  return new Promise((resolve, reject) => {
+    https.get(url, (response) => {
+      let data = "";
+
+      response.on("data", (chunk) => {
+        data += chunk;
+      });
+
+      response.on("end", () => {
+        try {
+          const result = JSON.parse(data) as T;
+          resolve(result);
+        } catch {
+          reject(new Error("Could not parse API response"));
+        }
+      });
+    }).on("error", (error) => {
+      reject(error);
+    });
+  });
+}
+
+export function fetchWeatherPromise(): Promise<WeatherData> {
+  return request<WeatherData>(weatherUrl);
+}
+
+export function fetchNewsPromise(): Promise<NewsData> {
+  return request<NewsData>(newsUrl);
+}
