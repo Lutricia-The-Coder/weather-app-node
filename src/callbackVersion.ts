@@ -1,5 +1,4 @@
 import { fetchWeather, fetchNews } from "./api";
-import { WeatherData, NewsData } from "./types";
 
 console.log("Starting callback version...");
 
