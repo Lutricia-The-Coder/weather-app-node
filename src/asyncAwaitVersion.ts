@@ -1,5 +1,5 @@
 import readline from "node:readline";
-import {searchCity, fetchWeatherPromise,fetchNewsPromise} from "./api";
+import {searchCity, fetchWeatherPromise,fetchNewsPromise,getWeatherDescription} from "./api";
 
 const rl = readline.createInterface({
   input: process.stdin,
@@ -28,7 +28,7 @@ async function runAsyncAwaitVersion(
     console.log("City:",  cityName);
     console.log( "Temperature:", weather.current.temperature_2m,weather.current_units.temperature_2m);
     console.log("Wind:", weather.current.wind_speed_10m, weather.current_units.wind_speed_10m );
-    console.log("Weather code:", weather.current.weather_code);
+    console.log("Weather :", getWeatherDescription(weather.current.weather_code));
 
     const news = await fetchNewsPromise();
 
@@ -63,7 +63,7 @@ async function runParallelRequests( latitude: number,longitude: number
 
     console.log("Temperature:",weather.current.temperature_2m,  weather.current_units.temperature_2m);
     console.log( "Wind:",weather.current.wind_speed_10m,weather.current_units.wind_speed_10m);
-    console.log( "Weather code:", weather.current.weather_code);
+    console.log( "Weather :", getWeatherDescription(weather.current.weather_code));
     console.log( "News articles:", news.posts.length);
     console.log("Parallel requests completed!");
 
