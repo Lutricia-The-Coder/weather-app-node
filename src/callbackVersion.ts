@@ -23,67 +23,40 @@ rl.question("Enter a city: ", (city) => {
       rl.close();
       return;
     }
-
-    console.log(
-      `\nCity found: ${location.name}`
-    );
+    console.log(`\nCity found: ${location.name}`);
 
     fetchWeather(
       location.latitude,
       location.longitude,
       (weatherError, weather) => {
-
         if (weatherError) {
-          console.error(
-            "Weather error:",
-            weatherError.message
-          );
+          console.error("Weather error:",weatherError.message);
           rl.close();
           return;
         }
 
         if (!weather) {
-          console.error(
-            "Weather data is unavailable."
-          );
+          console.error("Weather data is unavailable." );
           rl.close();
           return;
         }
 
         console.log("\n=== WEATHER ===");
 
-        console.log(
-          "Temperature:",
-          weather.current.temperature_2m,
-          weather.current_units.temperature_2m
-        );
-
-        console.log(
-          "Wind:",
-          weather.current.wind_speed_10m,
-          weather.current_units.wind_speed_10m
-        );
-
-        console.log(
-          "Weather code:",
-          weather.current.weather_code
-        );
+        console.log("Temperature:",weather.current.temperature_2m,weather.current_units.temperature_2m );
+        console.log("Wind:", weather.current.wind_speed_10m, weather.current_units.wind_speed_10m  );
+        console.log("Weather code:",weather.current.weather_code );
 
         fetchNews((newsError, news) => {
 
           if (newsError) {
-            console.error(
-              "News error:",
-              newsError.message
-            );
+            console.error("News error:",newsError.message);
             rl.close();
             return;
           }
 
           if (!news) {
-            console.error(
-              "News data is unavailable."
-            );
+            console.error( "News data is unavailable.");
             rl.close();
             return;
           }
@@ -91,15 +64,10 @@ rl.question("Enter a city: ", (city) => {
           console.log("\n=== NEWS HEADLINES ===");
 
           news.posts.forEach((post, index) => {
-            console.log(
-              `${index + 1}. ${post.title}`
-            );
+            console.log( `${index + 1}. ${post.title}` );
           });
 
-          console.log(
-            "\nCallback version completed!"
-          );
-
+          console.log( "\nCallback version completed!" );
           rl.close();
         });
       }

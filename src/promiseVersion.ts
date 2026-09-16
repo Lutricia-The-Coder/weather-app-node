@@ -1,59 +1,111 @@
-import {fetchWeatherPromise, fetchNewsPromise} from "./api";
+import readline from "node:readline";
+import {searchCity, fetchWeatherPromise, fetchNewsPromise} from "./api";
+
+const rl = readline.createInterface({
+  input: process.stdin,
+  output: process.stdout
+});
 
 console.log("Starting Promise version...");
-fetchWeatherPromise()
-  .then((weather) => {
+rl.question("Enter a city: ", (city) => {
 
-    console.log("\n=== WEATHER ===");
+  searchCity(city, (cityError, location) => {
 
-    console.log("Temperature:", weather.current.temperature_2m,weather.current_units.temperature_2m  );
-    console.log("Wind:", weather.current.wind_speed_10m, weather.current_units.wind_speed_10m );
+    if (cityError) {
+      console.error("City error:", cityError.message);
+      rl.close();
+      return;
+    }
 
-    // Fetch news after weather has completed
-    return fetchNewsPromise();
-  })
-  .then((news) => {
-    console.log("\n=== NEWS HEADLINES ===");
+    if (!location) {
+      console.error("City location is unavailable.");
+      rl.close();
+      return;
+    }
 
-    news.posts.forEach((post, index) => {
-      console.log(`${index + 1}. ${post.title}` ); });
-    console.log( "\nPromise chain completed!");
-  })
-  .catch((error: Error) => {
-    console.error(  "Promise error:",error.message);
+    console.log(`\nCity found: ${location.name}`);
+
+    fetchWeatherPromise(  location.latitude,location.longitude )
+      .then((weather) => {
+        console.log("\n=== WEATHER ===");
+        console.log( "Temperature:", weather.current.temperature_2m, weather.current_units.temperature_2m );
+        console.log( "Wind:",weather.current.wind_speed_10m, weather.current_units.wind_speed_10m);
+console.log( "Weather code:", weather.current.weather_code);
+        return fetchNewsPromise();
+      })
+      .then((news) => {
+
+        console.log("\n=== NEWS HEADLINES ===");
+
+        news.posts.forEach((post, index) => {
+          console.log(`${index + 1}. ${post.title}`);
+        });
+
+        console.log(
+          "\nPromise chain completed!" );
+
+        return runPromiseExamples(location.latitude, location.longitude
+        );
+      })
+      .catch((error) => {
+
+        if (error instanceof Error) {
+          console.error(  "Promise error:", error.message);
+        } else {
+          console.error( "Promise error: Unknown error" );
+        }
+        rl.close();
+      });
   });
+});
 
+async function runPromiseExamples( latitude: number, longitude: number): Promise<void> {
   console.log("\nStarting Promise.all()...");
 
- // Fetch weather and news at the same time using Promise.all()
-Promise.all([fetchWeatherPromise(), fetchNewsPromise()])
-  .then(([weather, news]) => {
+  try {
+    const [weather, news] = await Promise.all([
+      fetchWeatherPromise(latitude, longitude),  fetchNewsPromise()
+    ]);
 
     console.log("\n=== PROMISE.ALL RESULTS ===");
 
-    console.log("Temperature:", weather.current.temperature_2m,weather.current_units.temperature_2m );
-    console.log("Wind:", weather.current.wind_speed_10m,weather.current_units.wind_speed_10m);
-    console.log("Number of news articles:", news.posts.length);
-    console.log("Promise.all() completed!");
-  })
-  .catch((error: Error) => {
-    console.error("Promise.all() error:",error.message );
-  });
+    console.log( "Temperature:",  weather.current.temperature_2m, weather.current_units.temperature_2m);
+    console.log("Wind:",weather.current.wind_speed_10m, weather.current_units.wind_speed_10m);
+    console.log("Weather code:", weather.current.weather_code);
+    console.log( "Number of news articles:", news.posts.length);
+ console.log("Promise.all() completed!" );
+
+  } catch (error) {
+
+    if (error instanceof Error) {
+      console.error( "Promise.all() error:", error.message );
+    } else {
+      console.error("Promise.all() error: Unknown error");
+    }
+  }
 
   console.log("\nStarting Promise.race()...");
-// Fetch weather and news at the same time using Promise.race()
-Promise.race([
-  fetchWeatherPromise()
-    .then(() => "Weather request finished first"),
 
-  fetchNewsPromise()
-    .then(() => "News request finished first")
-])
-  .then((result) => {
+  try {
+    const firstResult = await Promise.race([
+      fetchWeatherPromise(latitude, longitude)
+        .then(() => "Weather request finished first"),
+
+      fetchNewsPromise()
+        .then(() => "News request finished first")
+    ]);
+
     console.log("\n=== PROMISE.RACE RESULT ===");
-    console.log(result);
+    console.log(firstResult);
     console.log("Promise.race() completed!");
-  })
-  .catch((error: Error) => {
-    console.error( "Promise.race() error:", error.message );
-  });
+
+  } catch (error) {
+
+    if (error instanceof Error) {
+      console.error( "Promise.race() error:",error.message);
+    } else {
+      console.error(  "Promise.race() error: Unknown error");
+    }
+  }
+  rl.close();
+}
