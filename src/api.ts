@@ -1,5 +1,5 @@
 import https from "node:https";
-import { WeatherData, NewsData } from "./types";
+import { CityLocation, WeatherData, NewsData } from "./types";
 
 const latitude = -23.9045;
 const longitude = 29.4689;
@@ -10,6 +10,47 @@ const weatherUrl =
   `&current=temperature_2m,wind_speed_10m,weather_code`;
 
 const newsUrl = "https://dummyjson.com/posts?limit=5";
+const geocodingUrl =
+  "https://geocoding-api.open-meteo.com/v1/search";
+export function searchCity(
+  city: string,
+  callback: (error: Error | null, data?: CityLocation) => void
+): void {
+  const url =
+    `${geocodingUrl}?name=${encodeURIComponent(city)}&count=1`;
+
+  https.get(url, (response) => {
+    let data = "";
+
+    response.on("data", (chunk) => {
+      data += chunk;
+    });
+
+    response.on("end", () => {
+      try {
+        const result = JSON.parse(data);
+
+        if (!result.results || result.results.length === 0) {
+          callback(new Error("City not found"));
+          return;
+        }
+
+        const location: CityLocation = {
+          name: result.results[0].name,
+          latitude: result.results[0].latitude,
+          longitude: result.results[0].longitude
+        };
+
+        callback(null, location);
+
+      } catch {
+        callback(new Error("Could not parse city data"));
+      }
+    });
+  }).on("error", (error) => {
+    callback(error);
+  });
+}
 
 export function fetchWeather(
   callback: (error: Error | null, data?: WeatherData) => void
