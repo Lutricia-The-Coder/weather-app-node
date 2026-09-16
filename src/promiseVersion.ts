@@ -40,9 +40,7 @@ console.log( "Weather :", getWeatherDescription(weather.current.weather_code) );
         news.posts.forEach((post, index) => {
           console.log(`${index + 1}. ${post.title}`);
         });
-
-        console.log(
-          "\nPromise chain completed!" );
+        console.log("\nPromise chain completed!" );
 
         return runPromiseExamples(location.latitude, location.longitude
         );
@@ -72,7 +70,12 @@ async function runPromiseExamples( latitude: number, longitude: number): Promise
     console.log( "Temperature:",  weather.current.temperature_2m, weather.current_units.temperature_2m);
     console.log("Wind:",weather.current.wind_speed_10m, weather.current_units.wind_speed_10m);
     console.log("Weather :", getWeatherDescription(weather.current.weather_code));
-    console.log( "Number of news articles:", news.posts.length);
+
+        console.log("\n=== NEWS HEADLINES ===");
+
+news.posts.forEach((post, index) => {
+  console.log( `${index + 1}. ${post.title}`);
+});
  console.log("Promise.all() completed!" );
 
   } catch (error) {
@@ -97,6 +100,7 @@ async function runPromiseExamples( latitude: number, longitude: number): Promise
 
     console.log("\n=== PROMISE.RACE RESULT ===");
     console.log(firstResult);
+    
     console.log("Promise.race() completed!");
 
   } catch (error) {
