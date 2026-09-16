@@ -48,35 +48,6 @@ async function runAsyncAwaitVersion(
   }
 }
 
-async function runParallelRequests( latitude: number,longitude: number
-): Promise<void> {
-
-  console.log("\nStarting parallel requests...");
-
-  try {
-    const [weather, news] = await Promise.all([
-      fetchWeatherPromise(latitude, longitude),
-      fetchNewsPromise()
-    ]);
-
-    console.log("\n=== PARALLEL RESULTS ===");
-
-    console.log("Temperature:",weather.current.temperature_2m,  weather.current_units.temperature_2m);
-    console.log( "Wind:",weather.current.wind_speed_10m,weather.current_units.wind_speed_10m);
-    console.log( "Weather :", getWeatherDescription(weather.current.weather_code));
-    console.log( "News articles:", news.posts.length);
-    console.log("Parallel requests completed!");
-
-  } catch (error) {
-
-    if (error instanceof Error) {
-      console.error(  "Parallel request error:",error.message);
-    } else {
-      console.error( "Parallel request error: Unknown error");
-    }
-  }
-}
-
 async function main(): Promise<void> {
 
   console.log("Starting city search...");
@@ -102,7 +73,7 @@ async function main(): Promise<void> {
     console.log( `\nCity found: ${location.name}` );
 
     await runAsyncAwaitVersion(  location.latitude, location.longitude,location.name )
-    await runParallelRequests( location.latitude, location.longitude);
+  
     rl.close();
   });
 }
