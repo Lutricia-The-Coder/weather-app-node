@@ -3,7 +3,11 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "dev": "nodemon --exec tsx src/server.ts"
+ "callback": "tsx src/callbackVersion.ts",
+  "promise": "tsx src/promiseVersion.ts",
+  "async": "tsx src/asyncAwaitVersion.ts",
+  "build": "tsc",
+  "check": "tsc --noEmit"
   },
   "keywords": [],
   "author": "",
