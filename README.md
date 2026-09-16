@@ -2,8 +2,9 @@
 
 ##  Project Overview
 
-The **Async Weather & News Dashboard** is a Node.js and TypeScript application created to demonstrate asynchronous programming in JavaScript.
+The **Async Weather & News Dashboard** is a Node.js and TypeScript project demonstrating asynchronous programming using  **callbacks, Promises, and async/await.**
 
+The application allows the user to enter a city, searches for its coordinates, retrieves current weather information, and displays sample news headlines.
 The application retrieves:
 
 * Current weather information from the **Open-Meteo API**
@@ -30,7 +31,7 @@ The project is designed to demonstrate how Node.js handles asynchronous operatio
 The main objectives of this project are to:
 
 * Demonstrate asynchronous programming in Node.js.
-* Demonstrate how the Node.js event loop works at a basic level.
+* Demonstrate how the Node.js event loop works
 * Retrieve data from public APIs.
 * Implement asynchronous API requests using callbacks.
 * Demonstrate callback nesting and callback hell.
@@ -41,6 +42,7 @@ The main objectives of this project are to:
 * Refactor Promise-based code using async/await.
 * Demonstrate asynchronous error handling.
 * Use TypeScript interfaces to provide type safety.
+* Working with JSON APIs
 * Compare callbacks, Promises, and async/await.
 
 ---
@@ -54,6 +56,7 @@ The project uses the following technologies:
 * **tsx** — Runs TypeScript files directly
 * **Node.js `https` module** — Makes HTTP requests
 * **Open-Meteo API** — Provides weather information
+* **Open-Meteo Geocoding API** - Gets location
 * **DummyJSON API** — Provides news-style posts
 * **npm** — Package and script management
 * **Git** — Version control
@@ -74,14 +77,19 @@ The application requests:
 
 The weather request uses latitude and longitude coordinates.
 
-Example coordinates used by the application:
-
-```text
-Latitude: -23.9045
-Longitude: 29.4689
-```
-
 The weather API returns structured JSON data containing the current weather information and its corresponding units.
+
+---
+
+##  Open-Meteo Geocoding API
+
+Open-Meteo is used to search for a city and obtain:
+
+* City name
+* Latitude
+* Longitude
+
+This allows the user to enter different cities instead of using hard-coded coordinates.
 
 ---
 
@@ -128,6 +136,15 @@ It contains callback-based functions as well as Promise-based functions.
 
 The file is responsible for communicating with the external APIs.
 
+It includes:
+
+*City search
+*Callback weather request
+*Callback news request
+*Promise weather request
+*Promise news request
+*Weather-code conversion
+
 ---
 
 ### `src/types.ts`
@@ -137,10 +154,9 @@ Contains TypeScript interfaces used to describe the expected API response struct
 The main interfaces are:
 
 * `WeatherData`
+* `City Locations`
 * `NewsPost`
-* `NewsData`
-
-Using interfaces provides better type safety than using `any`.
+* `News API responses`
 
 ---
 
@@ -148,21 +164,18 @@ Using interfaces provides better type safety than using `any`.
 
 Demonstrates asynchronous programming using callbacks.
 
-The weather request is performed first and the news request is performed inside the weather callback.
-
 This intentionally demonstrates callback nesting/callback hell.
 
 ---
 
 ### `src/promiseVersion.ts`
 
-Demonstrates asynchronous programming using Promises.
-
-It contains examples of:
+Demonstrates 
 
 * Promise chaining
 * `Promise.all()`
 * `Promise.race()`
+* `Promise error handling`
 
 ---
 
@@ -173,8 +186,10 @@ Demonstrates asynchronous programming using async/await.
 It also demonstrates:
 
 * `try...catch`
+* `async`
+* `await`
 * Sequential asynchronous operations
-* Parallel asynchronous operations using `Promise.all()`
+* `Refactoring Promise-based code using async/await`
 
 ---
 
@@ -250,29 +265,17 @@ Run:
 npm run callback
 ```
 
-This executes:
+The program asks:
 
 ```text
-src/callbackVersion.ts
+Enter a city:
 ```
 
-The callback version performs the following:
+Example:
 
-```text
-Start
-  ↓
-Fetch weather
-  ↓
-Weather callback
-  ↓
-Fetch news
-  ↓
-News callback
-  ↓
-Display results
-```
+Enter a city: Mbombela
 
-The nested structure demonstrates callback hell.
+The application then searches for the city and retrieves its weather and sample news.
 
 ---
 
@@ -295,6 +298,7 @@ The Promise version demonstrates:
 * Promise chaining
 * `Promise.all()`
 * `Promise.race()`
+* Error handlingwith `.catch()`
 
 ---
 
@@ -317,7 +321,6 @@ The async/await version demonstrates:
 * `async`
 * `await`
 * `try...catch`
-* `Promise.all()`
 
 ---
 
@@ -384,172 +387,76 @@ The project uses the following npm scripts:
 }
 ```
 
-## Script Summary
-
-| Script             | Purpose                             |
-| ------------------ | ----------------------------------- |
-| `npm run callback` | Runs the callback implementation    |
-| `npm run promise`  | Runs the Promise implementation     |
-| `npm run async`    | Runs the async/await implementation |
-| `npm run check`    | Checks TypeScript for errors        |
-| `npm run build`    | Compiles TypeScript to JavaScript   |
-
 ---
 
 #  Callback Implementation
 
-Callbacks are functions that are passed to another function and executed later when an asynchronous operation has completed.
+The callback version uses Node.js callbacks to handle asynchronous operations.
 
-A simplified example is:
+The flow is:
 
-```typescript
-fetchWeather((error, weather) => {
-    // Handle the result
-});
-```
+User enters city
+       ↓
+Search city
+       ↓
+Get latitude and longitude
+       ↓
+Fetch weather
+       ↓
+Fetch news
+       ↓
+Display results
 
-The callback receives two possible values:
+The operations are performed sequentially because the weather request needs the coordinates returned by the city search.
 
-* An error
-* The requested data
-
-The API implementation follows the common Node.js callback pattern:
-
-```text
-callback(error, data)
-```
-
-When the request succeeds:
-
-```typescript
-callback(null, weather);
-```
-
-When an error occurs:
-
-```typescript
-callback(error);
-```
-
+The news request is started after the weather request completes.
 ---
 
 #  Callback Hell
 
 Callback hell occurs when multiple asynchronous operations depend on each other and callbacks become deeply nested.
 
-The project intentionally demonstrates this because understanding callback hell is one of the learning objectives.
+The structure is:
 
-The structure is approximately:
-
-```text
+searchCity()
+    ↓
 fetchWeather()
-    │
-    └── weather callback
-            │
-            └── fetchNews()
-                    │
-                    └── news callback
+    ↓
+fetchNews()
+    ↓
+display results
+
+Each asynchronous operation is placed inside the callback of the previous operation.
+
 ```
-
-The code looks like:
-
-```typescript
-fetchWeather((weatherError, weather) => {
-
-    if (weatherError) {
-        console.error(weatherError.message);
-        return;
-    }
-
-    console.log(weather);
-
-    fetchNews((newsError, news) => {
-
-        if (newsError) {
-            console.error(newsError.message);
-            return;
-        }
-
-        console.log(news);
-    });
-});
-```
-
-For only two operations this is manageable, but if more dependent operations were added, the nesting could become difficult to read and maintain.
 
 ---
 
 #  Promise Implementation
 
-Promises provide another way of handling asynchronous operations.
+The Promise version replaces deeply nested asynchronous logic with Promises.
 
-A Promise represents the eventual result of an asynchronous operation.
+The main sequence is:
 
-A Promise can be:
-
-* Pending
-* Fulfilled
-* Rejected
-
-The project creates Promise-based API functions:
-
-```typescript
-fetchWeatherPromise()
-fetchNewsPromise()
-```
-
-These functions return:
-
-```typescript
-Promise<WeatherData>
-```
-
-and:
-
-```typescript
-Promise<NewsData>
-```
-
----
-
-#  Promise Chaining
-
-The Promise version demonstrates dependent requests using `.then()`.
-
-The basic structure is:
-
-```typescript
-fetchWeatherPromise()
-    .then((weather) => {
-        return fetchNewsPromise();
-    })
-    .then((news) => {
-        // Display news
-    })
-    .catch((error) => {
-        // Handle error
-    });
-```
-
-The second request is started after the first request has completed.
-
-The structure is:
-
-```text
-Weather Promise
-      ↓
-    .then()
-      ↓
-News Promise
-      ↓
-    .then()
-      ↓
+Search city
+    ↓
+Fetch weather
+    ↓
+Fetch news
+    ↓
 Display results
-      ↓
-   .catch()
-```
 
-The `.catch()` handles rejected Promises.
+Promise chaining is performed using:
+
+.then()
+.then()
+.catch()
+
+Errors are handled using:
+
+.catch()
+
+This makes the asynchronous flow easier to follow than deeply nested callbacks.
 
 ---
 
@@ -588,27 +495,17 @@ This allows independent asynchronous operations to be handled together.
 
 #  Promise.race()
 
-`Promise.race()` waits for the first supplied Promise to settle.
+The Promise version also demonstrates Promise.race().
 
-In this project, the weather and news requests are placed into a race.
+Two asynchronous requests are started:
 
-Example:
+Weather request ──────┐
+                      ├──→ First completed request
+News request ─────────┘
 
-```typescript
-Promise.race([
-    fetchWeatherPromise()
-        .then(() => "Weather request finished first"),
+Promise.race() settles when the first Promise settles.
 
-    fetchNewsPromise()
-        .then(() => "News request finished first")
-])
-.then((result) => {
-    console.log(result);
-})
-.catch((error) => {
-    console.error(error);
-});
-```
+The project uses this to demonstrate how multiple asynchronous operations can run at the same time and how the first completed operation can be identified.
 
 The result depends on network response times.
 
@@ -630,41 +527,25 @@ This is expected because the response times of network requests can vary.
 
 #  Async/Await Implementation
 
-Async/await provides a cleaner syntax for working with Promises.
+The async/await version focuses specifically on using async/await to make asynchronous code easier to read.
 
-An asynchronous function is declared using:
+The operations are performed sequentially:
 
-```typescript
-async function runAsyncAwaitVersion(): Promise<void>
-```
+Fetch weather
+      ↓
+Fetch news
+      ↓
+Display results
 
-A Promise can then be waited for using:
+The async/await version handles errors using:
 
-```typescript
-const weather = await fetchWeatherPromise();
-```
+try {
+  // asynchronous operations
+} catch (error) {
+  // error handling
+}
 
-The project then waits for the news request:
-
-```typescript
-const news = await fetchNewsPromise();
-```
-
-The structure is:
-
-```text
-async function
-      │
-      ├── await weather
-      │
-      ├── display weather
-      │
-      ├── await news
-      │
-      └── display news
-```
-
-Although the code looks synchronous, the API requests remain asynchronous.
+This demonstrates how Promise-based code can be written in a more readable style using async and await.
 
 ---
 
@@ -903,10 +784,14 @@ Example:
 
 ```text
 Starting callback version...
+Enter a city: Mbombela
+
+City found: Mbombela
 
 === WEATHER ===
 Temperature: 24 °C
 Wind: 7.4 km/h
+Weather: Mainly clear
 
 === NEWS HEADLINES ===
 1. His mother had always taught him
@@ -925,25 +810,14 @@ Callback version completed!
 Example:
 
 ```text
-Starting Promise version...
+Enter a city: Mbombela
 
-Starting Promise.all()...
-
-Starting Promise.race()...
-
-=== PROMISE.RACE RESULT ===
-Weather request finished first
-Promise.race() completed!
+City found: Mbombela
 
 === WEATHER ===
-Temperature: 24 °C
-Wind: 7.4 km/h
-
-=== PROMISE.ALL RESULTS ===
-Temperature: 24 °C
-Wind: 7.4 km/h
-Number of news articles: 5
-Promise.all() completed!
+Temperature: 29.1 °C
+Wind: 6.3 km/h
+Weather: Mainly clear
 
 === NEWS HEADLINES ===
 1. His mother had always taught him
@@ -953,9 +827,24 @@ Promise.all() completed!
 5. Hopes and dreams were dashed that day.
 
 Promise chain completed!
+
+Starting Promise.all()...
+
+=== PROMISE.ALL RESULTS ===
+Temperature: 29.1 °C
+Wind: 6.3 km/h
+Weather: Mainly clear
+Number of news articles: 5
+Promise.all() completed!
+
+Starting Promise.race()...
+
+=== PROMISE.RACE RESULT ===
+Weather request finished first
+Promise.race() completed!
 ```
 
-The exact order may change because the asynchronous requests have different response times.
+The result of Promise.race() may be different between runs because it depends on which asynchronous request settles first.
 
 ---
 
@@ -964,11 +853,18 @@ The exact order may change because the asynchronous requests have different resp
 Example:
 
 ```text
+Starting city search...
+Enter a city: Mbombela
+
+City found: Mbombela
+
 Starting async/await version...
 
 === WEATHER ===
-Temperature: 23.4 °C
+City: Mbombela
+Temperature: 29.1 °C
 Wind: 6.3 km/h
+Weather: Mainly clear
 
 === NEWS HEADLINES ===
 1. His mother had always taught him
@@ -978,15 +874,6 @@ Wind: 6.3 km/h
 5. Hopes and dreams were dashed that day.
 
 Async/await version completed!
-
-Starting parallel requests...
-
-=== PARALLEL RESULTS ===
-Temperature: 23.4 °C
-Wind: 6.3 km/h
-News articles: 5
-
-Parallel requests completed!
 ```
 
 Weather values can change because the application retrieves live weather data.
@@ -1037,38 +924,6 @@ All three versions should successfully retrieve weather and news data.
 
 ---
 
-#  Error Scenarios
-
-The application includes error handling for possible problems such as:
-
-* Network errors
-* Failed HTTP requests
-* Invalid JSON responses
-* Rejected Promises
-* Missing callback data
-
-The application reports errors using messages such as:
-
-```text
-Weather error: ...
-```
-
-```text
-News error: ...
-```
-
-```text
-Promise error: ...
-```
-
-```text
-Async/await error: ...
-```
-
-This prevents errors from failing silently.
-
----
-
 `node_modules` contains installed dependencies and can be recreated using:
 
 ```bash
@@ -1113,25 +968,7 @@ After completing this project, I can:
 
 #  Conclusion
 
-The Async Weather & News Dashboard demonstrates three major approaches to asynchronous programming in Node.js:
-
-```text
-Callbacks
-    ↓
-Promises
-    ↓
-Async/Await
-```
-
-The callback implementation demonstrates how asynchronous results can be handled using functions and also demonstrates callback hell through nested asynchronous requests.
-
-The Promise implementation demonstrates how asynchronous operations can be chained and coordinated using Promise utilities such as `Promise.all()` and `Promise.race()`.
-
-The async/await implementation provides a cleaner syntax for working with Promises and uses `try...catch` for error handling.
-
-The project also demonstrates that asynchronous operations do not block the Node.js event loop while waiting for network responses.
-
-Overall, the project provides a practical comparison of different asynchronous programming techniques and demonstrates how modern JavaScript and TypeScript applications can handle asynchronous API operations.
+The project also demonstrates API requests, TypeScript type safety, error handling, city searching, weather-code conversion, and sequential versus parallel asynchronous operations.
 
 ---
 

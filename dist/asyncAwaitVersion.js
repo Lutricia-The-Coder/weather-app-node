@@ -32,7 +32,7 @@ function runAsyncAwaitVersion(latitude, longitude, cityName) {
             console.log("City:", cityName);
             console.log("Temperature:", weather.current.temperature_2m, weather.current_units.temperature_2m);
             console.log("Wind:", weather.current.wind_speed_10m, weather.current_units.wind_speed_10m);
-            console.log("Weather code:", weather.current.weather_code);
+            console.log("Weather :", (0, api_1.getWeatherDescription)(weather.current.weather_code));
             const news = yield (0, api_1.fetchNewsPromise)();
             console.log("\n=== NEWS HEADLINES ===");
             news.posts.forEach((post, index) => {
@@ -46,31 +46,6 @@ function runAsyncAwaitVersion(latitude, longitude, cityName) {
             }
             else {
                 console.error("Async/await error: Unknown error");
-            }
-        }
-    });
-}
-function runParallelRequests(latitude, longitude) {
-    return __awaiter(this, void 0, void 0, function* () {
-        console.log("\nStarting parallel requests...");
-        try {
-            const [weather, news] = yield Promise.all([
-                (0, api_1.fetchWeatherPromise)(latitude, longitude),
-                (0, api_1.fetchNewsPromise)()
-            ]);
-            console.log("\n=== PARALLEL RESULTS ===");
-            console.log("Temperature:", weather.current.temperature_2m, weather.current_units.temperature_2m);
-            console.log("Wind:", weather.current.wind_speed_10m, weather.current_units.wind_speed_10m);
-            console.log("Weather code:", weather.current.weather_code);
-            console.log("News articles:", news.posts.length);
-            console.log("Parallel requests completed!");
-        }
-        catch (error) {
-            if (error instanceof Error) {
-                console.error("Parallel request error:", error.message);
-            }
-            else {
-                console.error("Parallel request error: Unknown error");
             }
         }
     });
@@ -92,7 +67,6 @@ function main() {
             }
             console.log(`\nCity found: ${location.name}`);
             yield runAsyncAwaitVersion(location.latitude, location.longitude, location.name);
-            yield runParallelRequests(location.latitude, location.longitude);
             rl.close();
         }));
     });
