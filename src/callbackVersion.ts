@@ -1,5 +1,5 @@
 import readline from "node:readline";
-import { searchCity, fetchWeather, fetchNews } from "./api";
+import { searchCity, fetchWeather, fetchNews ,  getWeatherDescription} from "./api";
 
 const rl = readline.createInterface({
   input: process.stdin,
@@ -45,7 +45,7 @@ rl.question("Enter a city: ", (city) => {
 
         console.log("Temperature:",weather.current.temperature_2m,weather.current_units.temperature_2m );
         console.log("Wind:", weather.current.wind_speed_10m, weather.current_units.wind_speed_10m  );
-        console.log("Weather code:",weather.current.weather_code );
+        console.log("Weather :", getWeatherDescription(weather.current.weather_code));
 
         fetchNews((newsError, news) => {
 
