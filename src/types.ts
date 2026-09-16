@@ -1,3 +1,8 @@
+export interface CityLocation {
+  name: string;
+  latitude: number;
+  longitude: number;
+}
 export interface WeatherData {
   latitude: number;
   longitude: number;
