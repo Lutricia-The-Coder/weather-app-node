@@ -77,13 +77,6 @@ The application requests:
 
 The weather request uses latitude and longitude coordinates.
 
-Example coordinates used by the application:
-
-```text
-Latitude: -23.9045
-Longitude: 29.4689
-```
-
 The weather API returns structured JSON data containing the current weather information and its corresponding units.
 
 ---
