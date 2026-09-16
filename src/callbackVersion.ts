@@ -1,38 +1,108 @@
-import { fetchWeather, fetchNews } from "./api";
+import readline from "node:readline";
+import { searchCity, fetchWeather, fetchNews } from "./api";
+
+const rl = readline.createInterface({
+  input: process.stdin,
+  output: process.stdout
+});
 
 console.log("Starting callback version...");
 
-fetchWeather((weatherError, weather) => {
-  if (weatherError) {
-    console.error("Weather error:", weatherError.message );
-    return;
-  }
-  if (!weather) {
-    console.error("Weather data is unavailable.");
-    return;
-  }
-  console.log("\n=== WEATHER ===");
-  console.log( "Temperature:",weather.current.temperature_2m);
-  console.log("Wind:", weather.current.wind_speed_10m);
+rl.question("Enter a city: ", (city) => {
 
-  // Second asynchronous request
-  fetchNews((newsError, news) => {
-    if (newsError) {
-      console.error("News error:",newsError.message );
-      return;
-    }
-   if (!news) {
-      console.error("News data is unavailable.");
+  searchCity(city, (cityError, location) => {
+
+    if (cityError) {
+      console.error("City error:", cityError.message);
+      rl.close();
       return;
     }
 
-    console.log("\n=== NEWS HEADLINES ===");
-    news.posts.forEach(
-      (post: any, index: number) => {
-        console.log(`${index + 1}. ${post.title}`);
-      }
+    if (!location) {
+      console.error("City location is unavailable.");
+      rl.close();
+      return;
+    }
+
+    console.log(
+      `\nCity found: ${location.name}`
     );
 
-    console.log("\nCallback version completed!");
+    fetchWeather(
+      location.latitude,
+      location.longitude,
+      (weatherError, weather) => {
+
+        if (weatherError) {
+          console.error(
+            "Weather error:",
+            weatherError.message
+          );
+          rl.close();
+          return;
+        }
+
+        if (!weather) {
+          console.error(
+            "Weather data is unavailable."
+          );
+          rl.close();
+          return;
+        }
+
+        console.log("\n=== WEATHER ===");
+
+        console.log(
+          "Temperature:",
+          weather.current.temperature_2m,
+          weather.current_units.temperature_2m
+        );
+
+        console.log(
+          "Wind:",
+          weather.current.wind_speed_10m,
+          weather.current_units.wind_speed_10m
+        );
+
+        console.log(
+          "Weather code:",
+          weather.current.weather_code
+        );
+
+        fetchNews((newsError, news) => {
+
+          if (newsError) {
+            console.error(
+              "News error:",
+              newsError.message
+            );
+            rl.close();
+            return;
+          }
+
+          if (!news) {
+            console.error(
+              "News data is unavailable."
+            );
+            rl.close();
+            return;
+          }
+
+          console.log("\n=== NEWS HEADLINES ===");
+
+          news.posts.forEach((post, index) => {
+            console.log(
+              `${index + 1}. ${post.title}`
+            );
+          });
+
+          console.log(
+            "\nCallback version completed!"
+          );
+
+          rl.close();
+        });
+      }
+    );
   });
 });
