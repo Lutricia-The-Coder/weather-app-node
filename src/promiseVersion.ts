@@ -1,5 +1,5 @@
 import readline from "node:readline";
-import {searchCity, fetchWeatherPromise, fetchNewsPromise} from "./api";
+import {searchCity, fetchWeatherPromise, fetchNewsPromise , getWeatherDescription} from "./api";
 
 const rl = readline.createInterface({
   input: process.stdin,
@@ -30,7 +30,7 @@ rl.question("Enter a city: ", (city) => {
         console.log("\n=== WEATHER ===");
         console.log( "Temperature:", weather.current.temperature_2m, weather.current_units.temperature_2m );
         console.log( "Wind:",weather.current.wind_speed_10m, weather.current_units.wind_speed_10m);
-console.log( "Weather code:", weather.current.weather_code);
+console.log( "Weather :", getWeatherDescription(weather.current.weather_code) );
         return fetchNewsPromise();
       })
       .then((news) => {
@@ -71,7 +71,7 @@ async function runPromiseExamples( latitude: number, longitude: number): Promise
 
     console.log( "Temperature:",  weather.current.temperature_2m, weather.current_units.temperature_2m);
     console.log("Wind:",weather.current.wind_speed_10m, weather.current_units.wind_speed_10m);
-    console.log("Weather code:", weather.current.weather_code);
+    console.log("Weather :", getWeatherDescription(weather.current.weather_code));
     console.log( "Number of news articles:", news.posts.length);
  console.log("Promise.all() completed!" );
 
