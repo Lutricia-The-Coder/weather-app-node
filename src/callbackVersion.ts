@@ -34,10 +34,10 @@ rl.question("Enter a city: ", (city) => {
           rl.close();
           return;
         }
-
+//if weather data is unavailable , return an error message and close the readline interface
         if (!weather) {
           console.error("Weather data is unavailable." );
-          rl.close();
+           rl.close();
           return;
         }
 

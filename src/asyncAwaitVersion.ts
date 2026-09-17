@@ -11,7 +11,7 @@ function askQuestion(question: string): Promise<string> {
     rl.question(question, resolve);
   });
 }
-
+// Implementing async/await to fetch weather and news data for a given city and log the results to the console
 async function runAsyncAwaitVersion(
   latitude: number,
   longitude: number,

@@ -5,7 +5,7 @@ const rl = readline.createInterface({
   input: process.stdin,
   output: process.stdout
 });
-
+// Starting the Promise version of the application (promise chaining)
 console.log("Starting Promise version...");
 rl.question("Enter a city: ", (city) => {
 
@@ -56,7 +56,7 @@ console.log( "Weather :", getWeatherDescription(weather.current.weather_code) );
       });
   });
 });
-
+// Implementing Promise.all() to fetch both weather and news data concurrently and log the results to the console.
 async function runPromiseExamples( latitude: number, longitude: number): Promise<void> {
   console.log("\nStarting Promise.all()...");
 
@@ -76,7 +76,7 @@ async function runPromiseExamples( latitude: number, longitude: number): Promise
 news.posts.forEach((post, index) => {
   console.log( `${index + 1}. ${post.title}`);
 });
- console.log("Promise.all() completed!" );
+ console.log("\nPromise.all() completed!" );
 
   } catch (error) {
 
@@ -86,7 +86,7 @@ news.posts.forEach((post, index) => {
       console.error("Promise.all() error: Unknown error");
     }
   }
-
+//implementing Promise.race() to determine which request (weather or news) finishes first and logs the result to the console.
   console.log("\nStarting Promise.race()...");
 
   try {
@@ -101,7 +101,7 @@ news.posts.forEach((post, index) => {
     console.log("\n=== PROMISE.RACE RESULT ===");
     console.log(firstResult);
     
-    console.log("Promise.race() completed!");
+    console.log("\nPromise.race() completed!");
 
   } catch (error) {
 

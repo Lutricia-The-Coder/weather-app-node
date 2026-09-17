@@ -102,6 +102,7 @@ export function fetchNews(
     callback(error);
   });
 }
+
 function request<T>(url: string): Promise<T> {
   return new Promise((resolve, reject) => {
     https.get(url, (response) => {
